@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linky učení</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f1f3f5;--ink:#1b2430;--mute:#6b7886;--panel:#fff;--line:#d5dbe1;--halo:#f1f3f5;--red:#e5484d;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b23;--ink:#e8edf2;--mute:#93a1b0;--panel:#1d2631;--line:#2d3947;--halo:#141b23;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Overpass',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px 4px;flex-wrap:wrap}
+h1{font-size:18px;font-weight:800;margin:0;margin-right:auto}
+#cnt{font-size:13px;color:var(--mute)}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.add{border:0;background:var(--ink);color:var(--bg);border-radius:20px;padding:7px 16px;font-weight:600;font-size:14px}
+.sm{border:2px solid var(--line);background:transparent;border-radius:20px;padding:4px 11px;font-size:13px;font-weight:600}
+:focus-visible{outline:3px solid #2f7de1;outline-offset:2px}
+#tabs{display:flex;gap:6px;padding:6px 16px;overflow-x:auto}
+.tab{border:2px solid var(--line);background:transparent;border-radius:18px;padding:5px 12px;font-weight:600;font-size:14px;white-space:nowrap}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bd{background:var(--red);color:#fff;border-radius:9px;font-size:11px;padding:1px 6px;margin-left:6px}
+#ban{display:none;margin:2px 16px 4px;padding:8px 12px;border-radius:10px;background:var(--panel);border:2px solid var(--red);align-items:center;gap:10px;justify-content:space-between;font-size:14px}
+#tip{padding:0 16px 6px;font-size:13px;color:var(--mute);min-height:20px}
+main{flex:1;min-height:0;overflow:auto}
+svg{display:block;user-select:none;-webkit-user-select:none}
+.st{cursor:pointer}
+.lbl{font-size:11.5px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--halo);stroke-width:3.5px;pointer-events:none;text-anchor:middle}
+.ln{font-size:14px;font-weight:800;cursor:pointer;paint-order:stroke;stroke:var(--halo);stroke-width:4px}
+.ring{fill:none;stroke-width:3;transform-box:fill-box;transform-origin:center;animation:p 1.1s ease-in-out infinite alternate}
+@keyframes p{from{opacity:.95;transform:scale(1)}to{opacity:.25;transform:scale(1.3)}}
+@media (prefers-reduced-motion:reduce){.ring{animation:none}}
+#wk{display:none;padding:8px 16px 90px;max-width:560px}
+#wk h3{font-size:15px;margin:16px 0 8px}
+.it{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 10px 8px 24px;margin-bottom:6px;font-weight:600;position:relative}
+.it i{position:absolute;left:9px;top:14px;width:8px;height:8px;border-radius:50%}
+.it small{color:var(--mute);font-weight:400}
+#empty{display:none;max-width:380px;margin:12vh auto 0;padding:0 20px;text-align:center;color:var(--mute);line-height:1.5}
+#empty b{color:var(--ink);font-size:20px;display:block;margin-bottom:6px}
+.pn{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(400px,calc(100% - 24px));background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:14px;display:none;box-shadow:0 6px 24px rgba(0,0,0,.14);max-height:82vh;overflow:auto}
+.pn.on{display:block}
+.pn h2{margin:0 0 4px;font-size:18px}
+.sub{font-size:13px;color:var(--mute);margin-bottom:10px}
+.sg{display:flex;gap:6px;margin-bottom:10px}
+.sg button{flex:1;border:2px solid var(--line);background:transparent;border-radius:8px;padding:8px 4px;font-size:14px;font-weight:600}
+.sg button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--panel)}
+.sg .ok{border-color:#1f9d55;color:#1f9d55}.sg .no{border-color:var(--red);color:var(--red)}
+textarea,input[type=text]{width:100%;border:2px solid var(--line);border-radius:8px;background:transparent;padding:8px;font-size:14px;margin-bottom:8px}
+textarea{resize:none;height:100px}#nt{height:60px}
+label{font-size:13px;color:var(--mute);display:block;margin-bottom:2px}
+.go{width:100%;border:0;background:var(--ink);color:var(--panel);border-radius:8px;padding:10px;font-weight:600;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;margin-top:4px}
+.row button{border:0;background:none;font-weight:600;font-size:14px;text-decoration:underline;padding:4px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line);border-radius:14px;padding:1px 4px 1px 10px;font-size:13px;margin:0 6px 6px 0}
+.chip button{border:0;background:none;font-size:16px;padding:0 4px}
+.msg{font-size:13px;color:var(--mute);margin:-2px 0 8px}
+</style>
+</head>
+<body>
+
+<!-- PŘIHLAŠOVACÍ OBRAZOVKA -->
+<div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <h2 style="margin-bottom:12px;">Přístup chráněn</h2>
+  <input type="password" id="pass-input" placeholder="Zadej heslo" style="width:200px; text-align:center; padding:8px; border:2px solid var(--line); border-radius:8px; background:var(--panel); margin-bottom:12px;">
+  <button class="add" id="pass-btn">Odemknout</button>
+</div>
+
+<script>
+  // NASTAVENÍ HESLA
+  const MOJE_HESLO = "shotbylaro2026"; // <-- ZDE SI NAPIŠ VLASTNÍ HESLO
+
+  const loginScreen = document.getElementById('login-screen');
+  const passBtn = document.getElementById('pass-btn');
+  const passInput = document.getElementById('pass-input');
+
+  if (sessionStorage.getItem('unlocked') === 'ano') {
+    loginScreen.style.display = 'none';
+  }
+
+  passBtn.onclick = () => {
+    if (passInput.value === MOJE_HESLO) {
+      loginScreen.style.display = 'none';
+      sessionStorage.setItem('unlocked', 'ano');
+    } else {
+      alert('Nesprávné heslo!');
+      passInput.value = '';
+    }
+  };
+
+  passInput.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') passBtn.click();
+  });
+</script>
+<!-- KONEC PŘIHLAŠOVACÍ OBRAZOVKY -->
+
+<header>
+  <h1>Linky učení</h1>
+  <span id="cnt"></span>
+  <!-- NOVÁ TLAČÍTKA PRO PAMĚŤ -->
+  <button class="sm" id="b-export" title="Stáhnout zálohu JSON">Uložit paměť</button>
+  <button class="sm" id="b-import" title="Načíst zálohu JSON">Načíst paměť</button>
+  <input type="file" id="f-import" accept=".json" style="display:none">
+  <!-- PŮVODNÍ TLAČÍTKA -->
+  <button class="sm" id="bd" title="Posune čas, abys viděl opakování">+1 den (test)</button>
+  <button class="add" id="ba">+ Přidat</button>
+</header>
+<nav id="tabs" role="tablist"></nav>
+<div id="ban"><span id="bt"></span><button class="add" id="go">Jet vlakem</button></div>
+<div id="tip"></div>
+<main id="mn">
+  <div id="empty"><b>Vlož první témata</b>Každý řádek je jedno téma, předmět napiš jako nadpis s dvojtečkou.<br><br><button class="add" id="be">Vložit témata</button></div>
+  <svg id="map" role="group" aria-label="Mapa témat"></svg>
+  <div id="wk"></div>
+</main>
+
+<div class="pn" id="p-add" role="dialog" aria-label="Přidat témata">
+  <h2 id="at">Přidat témata</h2><div class="sub"></div>
+  <label for="an">Předmět</label><input type="text" id="an" placeholder="např. Fyzika" autocomplete="off">
+  <label for="ax">Témata, každé na nový řádek</label>
+  <textarea id="ax" placeholder="Newtonovy zákony&#10;Energie"></textarea>
+  <div class="msg">Víc předmětů naráz: nadpisy s dvojtečkou (Fyzika:). Stejný název ve dvou předmětech se spojí přestupem.</div>
+  <button class="go" id="ago">Přidat</button>
+  <div class="row"><button id="adel" hidden>Smazat předmět</button><button class="x">Zavřít</button></div>
+</div>
+
+<div class="pn" id="p-st" role="dialog" aria-label="Detail tématu">
+  <h2 id="sn"></h2><div class="sub" id="ss"></div>
+  <div class="sg" id="sg"></div>
+  <div id="rv" hidden><div class="sub" id="rvt"></div><div class="sg"><button class="ok" id="rok">Pamatuju ✓</button><button class="no" id="rno">Zapomněl jsem</button></div></div>
+  <div id="lk"></div>
+  <button class="go" id="lnk">Spojit s dalším tématem</button>
+  <textarea id="nt" placeholder="Poznámky…" aria-label="Poznámky"></textarea>
+  <div class="row"><button id="sdel">Smazat téma</button><button class="x">Zavřít</button></div>
+</div>
+
+<div class="pn" id="p-run" role="dialog" aria-label="Jízda opakování">
+  <div class="sub" id="rs"></div><h2 id="rn"></h2><div class="sub" id="rnote"></div>
+  <div class="sg"><button class="ok" id="yes">Pamatuju ✓</button><button class="no" id="nope">Zapomněl jsem</button></div>
+  <div class="row"><button id="skip">Přeskočit</button><button class="x">Ukončit jízdu</button></div>
+</div>
+
+<script>
+const NS='http://www.w3.org/2000/svg',CW=330,CH=200,DAY=864e5,INT=[1,3,7,14,30,60],R=11;
+const PAL=['#2f6fd6','#d9342b','#1f9d55','#e08a00','#8b45c9','#0aa2b8','#d6428c','#6b7280','#7a9a01','#b5651d'];
+const ST=['Nové','Učím se','Umím'];
+const SEED=`@Čeština: příprava na maturitu
+Pravopis:
+Vyjmenovaná slova
+Párové hlásky
+Psaní n/nn
+Psaní s/z na začátku slova
+Spřežky
+Stavba slova
+Koncovky
+Pravopis přejatých slov
+Velká písmena: lidé a čas
+Velká písmena: místa
+Shoda přísudku s podmětem
+Chyby v textu a čárky:
+Hledání chyb v textu
+Čárky ve větách
+Slovotvorba a morfologie:
+Slovní druhy
+Stavba slova
+Tvoření slov
+Mluvnické kategorie sloves
+Slovesný vid
+Určování pádů ve větách
+Skloňování slov ve větách
+Skloňování zájmen
+Skloňování číslovky dva
+Stupňování přídavných jmen a příslovcí
+Skloňování a časování: mix
+Syntaktická analýza vět:
+Větné členy
+Rozbor věty jednoduché
+Graf věty jednoduché
+Poměry mezi hlavními větami
+Rozbor souvětí
+Druhy vedlejších vět
+Poměry vedlejších vět
+Čárky ve větách
+Grafy souvětí souřadných
+Grafy souvětí podřadných
+Slovní zásoba:
+Synonyma
+Antonyma
+Paronyma
+Charakteristiky osob
+Tituly a hodnosti
+Přídavná jména: svět a věda
+Ekonomika
+Porozumění textu:
+Imaginární slova
+Příbalové letáky
+Spisovatelé
+Básně
+Klimatické změny
+Česká literatura:
+Literární směry
+České: 19. století
+České: 1. polovina 20. století
+České: po roce 1950
+České: hlavní díla
+Čeští spisovatelé
+Světová literatura:
+Literární směry
+Světové: do 18. století
+Světové: 19. století
+Světové: 20. století
+Světové: hlavní díla
+Světoví spisovatelé
+Jazykové a literární pojmy:
+Literární směry
+Literární žánry
+Žánr a směr podle ukázky
+Gramatika: pojmy
+Sloh: pojmy
+Funkční styly
+Jazykové prostředky
+Jazykovědné obory
+Pojmy: mix
+@Fotografie: maturitní okruhy
+1. Reklama a legislativa:
+Historie reklamy
+Legislativa reklamy
+Reklamní fotografie a film
+2. Filmová řeč a gramatika:
+Filmová řeč
+Filmová gramatika
+Dokumentární film
+3. Fotografie architektury:
+Druhy architektury
+Vybavení a pravidla
+Karel Plicka
+4. Filmové žánry:
+Pojem a analýza žánru
+Vývoj a současnost žánrů
+Western, horor, detektivka, seriál
+5. Světlo a neviditelné záření:
+Povaha světla
+Měření světla
+IR a UV záření
+6. Reprodukce a skenery:
+Reprodukce a předlohy
+Postup reprodukce
+Skenery a parametry
+7. Makrofotografie a objektivy:
+Makrofotografie
+Dělení objektivů
+Zaostřovací vzdálenosti
+8. Filtry a stereofotografie:
+Fotografické filtry
+IR, UV a RTG záření
+Stereofotografie
+9. Optické přístroje a vady:
+Optické přístroje
+Optické vady
+Hloubka ostrosti
+10. Střih a malé žánry:
+Pravidla střihu
+Pracovní postup střihu
+Reportáž a hudební klip
+11. Reportážní a portrétní tvorba:
+Reportážní fotografie
+Portrétní fotografie
+Současná kinematografie
+12. Krajinářská fotografie a Landart:
+Krajinářská fotografie
+Kompozice a podmínky v krajině
+Landart
+13. Portrét a psychologie barev:
+Druhy portrétu
+Nasvětlení portrétu
+Psychologie a míchání barev
+14. Vývoj kinematografie:
+Historie kinematografie
+Nejstarší filmové žánry
+Průkopníci filmu
+15. Reportáž, dokument a výstava:
+Reportáž vs. dokument
+Druhy a zásady reportáže
+Příprava výstavy
+16. Zátiší a Josef Sudek:
+Zátiší a historie
+Pravidla snímkování
+Josef Sudek
+17. Fotomontáž a Dadaismus:
+Fotomontáž
+Analogová vs. digitální fotomontáž
+Dadaismus
+18. Kompozice a skladebné principy:
+Kompozice a zlatý řez
+Skladebné principy a chyby
+Barevná kompozice (HSB)
+19. Historie fotografování:
+Vznik a vývoj fotografování
+Historické technologie
+Konstrukce fotoaparátů
+20. Speciální techniky a materiály:
+Low key, high key, fotogram, izohélie
+Klasické techniky a imitace
+Negativní vrstvy a skladování`;
+const $=i=>document.getElementById(i);
+const el=(n,a,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const low=s=>s.trim().toLowerCase();
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D=null;try{D=JSON.parse(localStorage.getItem('metro5')||'null')}catch(e){}
+const save=()=>{try{localStorage.setItem('metro5',JSON.stringify(D))}catch(e){}};
+const now=()=>Date.now()+((D&&D.off)||0)*DAY;
+let tab='',sel=null,pos={},cell={},drag=null,linkFrom=null,run=null,hl=null,editLine=null;
+const grpOf=l=>(l.g||'Ostatní').split(':')[0];
+const groups=()=>[...new Set(D.lines.map(grpOf))];
+const lineOf=k=>D.lines.find(l=>l.s.includes(k));
+const links=k=>D.links.filter(l=>l.includes(k));
+const say=t=>$('tip').textContent=t;
+const HINT='Klepni na téma. Tažením od tématu k tématu je spojíš. Spojit jde jen to, co už se učíš nebo umíš.';
+
+function add(text,defName,g0){
+  let cur=defName.trim(),grp=g0||'';
+  const lineFor=n=>{let l=D.lines.find(x=>low(x.n)===low(n));
+    if(!l){l={id:'l'+Date.now().toString(36)+D.lines.length,n:n.trim(),c:PAL[D.lines.length%PAL.length],s:[]};if(grp)l.g=grp;D.lines.push(l)}return l};
+  text.split('\n').forEach(raw=>{
+    let t=raw.trim();if(!t)return;
+    if(t[0]==='@'){grp=t.slice(1).trim();return}
+    const h=t.match(/^#+\s*(.+?):?$/)||t.match(/^(.+):$/);
+    if(h){cur=h[1].trim();lineFor(cur);return}
+    t=t.replace(/^([-*•]|\d+[.)])\s+/,'');if(!t||!cur)return;
+    const l=lineFor(cur);
+    let id=Object.keys(D.st).find(k=>low(D.st[k].n)===low(t));
+    if(!id){id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);D.st[id]={n:t,s:0}}
+    if(!l.s.includes(id))l.s.push(id);
+  });
+  save();
+}
+if(!D){D={lines:[],st:{},links:[]};add(SEED,'')}
+if(!D.links)D.links=[];
+
+/* --- učení a opakování --- */
+const pass=k=>{const s=D.st[k];return s.s===2&&s.due<=now()?Math.min(6,1+Math.floor((now()-s.due)/DAY)):0};
+const dueList=()=>Object.keys(D.st).filter(k=>pass(k)>0);
+function setS(k,i){const s=D.st[k];s.s=i;s.t=now();if(i===2){if(!s.due){s.lv=0;s.due=now()+DAY}}else{delete s.due;delete s.lv}save()}
+function review(k,ok){const s=D.st[k];s.lv=ok?Math.min((s.lv||0)+1,5):0;
+  s.due=now()+Math.max(.5,INT[s.lv]/(1+.25*Math.min(4,links(k).length)))*DAY;save()}
+function route(){
+  const due=dueList().sort((a,b)=>D.st[a].due-D.st[b].due),set=new Set(due),seen=new Set(),r=[];
+  const adj=k=>links(k).map(l=>l[0]===k?l[1]:l[0]);
+  due.forEach(s=>{if(seen.has(s))return;const q=[s];seen.add(s);
+    while(q.length){const c=q.shift();r.push(c);adj(c).forEach(n=>{if(set.has(n)&&!seen.has(n)){seen.add(n);q.push(n)}})}});
+  return r;
+}
+function nextFor(g,n,ex){
+  const out=[];
+  D.lines.filter(l=>grpOf(l)===g).forEach(l=>{if(out.length>=n)return;
+    const k=l.s.find(x=>D.st[x].s===0&&!ex.includes(x)&&!out.includes(x));if(k)out.push(k)});
+  return out;
+}
+function tickWeek(){
+  const w=Math.floor((now()/DAY+3)/7);
+  if(D.wk!==w||!D.picks){D.wk=w;D.picks=groups().flatMap(g=>nextFor(g,2,[]));save()}
+}
+const plural=n=>n+' '+(n===1?'téma čeká':n<5?'témata čekají':'témat čeká');
+
+/* --- vykreslení --- */
+function wrap(n){
+  const o=[''];n.split(' ').forEach(x=>{const c=o[o.length-1];if(c&&(c+' '+x).length>13)o.push(x);else o[o.length-1]=(c+' '+x).trim()});
+  if(o.length>2){o.length=2;o[1]=o[1].slice(0,11)+'…'}return o;
+}
+function layout(){
+  pos={};cell={};
+  const vis=D.lines.filter(l=>tab==='Vše'||grpOf(l)===tab);
+  const cols=Math.max(1,Math.floor($('mn').clientWidth/CW));
+  vis.forEach((l,i)=>{
+    const cx=(i%cols)*CW,cy=Math.floor(i/cols)*CH+6;cell[l.id]=[cx,cy];
+    l.s.forEach((k,j)=>{if(!pos[k])pos[k]=[cx+42+(j%4)*76,cy+62+Math.floor(j/4)*56]});
+  });
+  return [Math.max(cols*CW,320),Math.ceil(vis.length/cols)*CH+30,vis];
+}
+function seg(a,b){
+  const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.abs(dy);
+  if(!dy||Math.abs(dx)<d)return`M${a} L${b}`;
+  const s=Math.sign(dx);return`M${a} L${b[0]-s*d},${a[1]} L${b}`;
+}
+function render(){
+  tickWeek();
+  const gs=groups(),tabs=['Vše',...gs,'Týden'];
+  if(!tab||!tabs.includes(tab))tab=gs.length?gs[0]:'Vše';
+  const due=dueList(),dg={};due.forEach(k=>{const g=grpOf(lineOf(k));dg[g]=(dg[g]||0)+1});
+  const open=D.picks.filter(k=>D.st[k]&&D.st[k].s===0).length;
+  $('tabs').innerHTML='';
+  tabs.forEach(t=>{
+    const b=document.createElement('button');b.className='tab';b.setAttribute('role','tab');b.setAttribute('aria-selected',t===tab);
+    b.textContent=t;const n=t==='Týden'?due.length+open:t==='Vše'?due.length:(dg[t]||0);
+    if(n){const s=document.createElement('span');s.className='bd';s.textContent=n;b.appendChild(s)}
+    b.onclick=()=>{tab=t;render()};$('tabs').appendChild(b);
+  });
+  const mp=Math.max(0,...dueList().map(pass));
+  $('ban').style.display=due.length?'flex':'none';
+  $('bt').textContent=(mp>=5?'Přetížená stanice! ':'')+plural(due.length)+' na zopakování ('+Object.entries(dg).map(e=>e[0]+' '+e[1]).join(', ')+')';
+  const ks=Object.keys(D.st),n2=ks.filter(k=>D.st[k].s===2).length;
+  $('cnt').textContent=ks.length?n2+'/'+ks.length+' umím · '+D.links.length+' spojů':'';
+  document.title=(due.length?'('+due.length+') ':'')+'Linky učení';
+  if(!linkFrom&&!$('tip').textContent)say(HINT);
+  const has=ks.length>0;$('empty').style.display=has?'none':'block';
+  const svg=$('map');
+  if(tab==='Týden'||!has){svg.style.display='none';$('wk').style.display=has?'block':'none';if(has)$('wk').innerHTML=wkHtml();return}
+  $('wk').style.display='none';svg.style.display='block';svg.innerHTML='';
+  const [W,H,vis]=layout();
+  svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  vis.forEach(l=>{
+    const t=el('text',{x:cell[l.id][0]+14,y:cell[l.id][1]+24,class:'ln',fill:l.c,tabindex:0,role:'button'},svg);
+    t.textContent=l.n;t.onclick=()=>openAdd(l);t.onkeydown=e=>{if(e.key==='Enter')openAdd(l)};
+    for(let i=1;i<l.s.length;i++)if(pos[l.s[i-1]]&&pos[l.s[i]])
+      el('path',{d:seg(pos[l.s[i-1]],pos[l.s[i]]),fill:'none',stroke:l.c,'stroke-width':3,'stroke-dasharray':'2 8','stroke-linecap':'round',opacity:.3},svg);
+  });
+  D.links.forEach(([a,b])=>{if(!pos[a]||!pos[b])return;
+    const x=grpOf(lineOf(a))!==grpOf(lineOf(b));
+    el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:x?'var(--ink)':lineOf(a).c,'stroke-width':8,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':x?'14 8':'none'},svg);
+  });
+  for(const k in pos){
+    const s=D.st[k],c=lineOf(k).c,n=pass(k);
+    const g=el('g',{class:'st',tabindex:0,role:'button','aria-label':s.n+', '+ST[s.s]+(n?', čeká na zopakování':''),transform:`translate(${pos[k]})`},svg);
+    if(n)el('circle',{class:'ring',r:R+7,stroke:'var(--red)'},g);
+    if(hl===k)el('circle',{class:'ring',r:R+10,stroke:'#2f7de1'},g);
+    if(s.s===0&&D.picks.includes(k))el('circle',{r:R+6,fill:'none',stroke:'var(--ink)','stroke-width':2,'stroke-dasharray':'2 4'},g);
+    el('circle',{r:R,stroke:c,'stroke-width':4,fill:s.s===2?'var(--ink)':s.s===1?c:'var(--panel)','stroke-dasharray':s.s===0?'4 3':'none'},g);
+    for(let i=0;i<n;i++)el('circle',{r:3.3,cx:(i-(n-1)/2)*8,cy:-R-12,fill:'var(--red)'},g);
+    wrap(s.n).forEach((tx,j)=>{el('text',{class:'lbl',y:R+15+j*12},g).textContent=tx});
+    g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tapSt(k)}};
+  }
+}
+function wkHtml(){
+  const H=k=>`<button class="it" data-k="${k}"><i style="background:${lineOf(k).c}"></i>${esc(D.st[k].n)}<small>${esc(grpOf(lineOf(k)))} · ${ST[D.st[k].s]}</small></button>`;
+  const due=dueList();
+  const nx=groups().flatMap(g=>nextFor(g,2,D.picks));
+  return '<h3>Tento týden se učíš</h3>'+(D.picks.length?D.picks.map(H).join(''):'<div class="sub">Všechna témata už máš načatá.</div>')
+   +'<h3>Čeká na zopakování</h3>'+(due.length?due.map(H).join('')+'<button class="go" id="go2" style="margin-top:6px">Jet vlakem ('+route().length+')</button>':'<div class="sub">Nic. Klidně si zkus „+1 den“ nahoře a podívej se, jak se opakování hlásí.</div>')
+   +'<h3>Příští týden</h3>'+(nx.length?nx.map(H).join(''):'<div class="sub">Zatím nic dalšího.</div>');
+}
+
+/* --- interakce --- */
+const svg=$('map');
+const pt=e=>{const r=svg.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+const hit=(p,r)=>Object.keys(pos).filter(k=>Math.hypot(pos[k][0]-p[0],pos[k][1]-p[1])<r).sort((a,b)=>Math.hypot(pos[a][0]-p[0],pos[a][1]-p[1])-Math.hypot(pos[b][0]-p[0],pos[b][1]-p[1]))[0];
+svg.onpointerdown=e=>{drag={k:hit(pt(e),24),p:pt(e),moved:false};try{svg.setPointerCapture(e.pointerId)}catch(x){}};
+svg.onpointermove=e=>{
+  if(!drag)return;const p=pt(e);
+  if(Math.hypot(p[0]-drag.p[0],p[1]-drag.p[1])>8)drag.moved=true;
+  if(drag.moved&&drag.k){
+    let t=$('tmp');if(!t)t=el('path',{id:'tmp',fill:'none','stroke-width':8,'stroke-linecap':'round',opacity:.55,'pointer-events':'none'},svg);
+    t.setAttribute('stroke',lineOf(drag.k).c);t.setAttribute('d',seg(pos[drag.k],p));
+  }
+};
+svg.onpointerup=e=>{
+  if(!drag)return;const d=drag;drag=null;const t=$('tmp');if(t)t.remove();const p=pt(e);
+  if(!d.moved){if(d.k)tapSt(d.k);else{const l=D.lines.find(l=>cell[l.id]&&p[0]>=cell[l.id][0]&&p[0]<cell[l.id][0]+CW&&p[1]>=cell[l.id][1]&&p[1]<cell[l.id][1]+CH);if(l)openAdd(l)}return}
+  if(d.k){const k=hit(p,28);if(k&&k!==d.k)connect(d.k,k)}
+};
+function connect(a,b){
+  if(D.st[a].s<1||D.st[b].s<1){say('Spojit jdou jen témata, která už se učíš nebo umíš.');return}
+  if(D.links.some(l=>l.includes(a)&&l.includes(b))){say('Tahle témata už spojená jsou.');return}
+  D.links.push([a,b]);save();say('Spojeno: '+D.st[a].n+' ↔ '+D.st[b].n);render();
+}
+function tapSt(k){
+  if(linkFrom){const a=linkFrom;linkFrom=null;if(a!==k)connect(a,k);else{say(HINT)}return}
+  openSt(k);
+}
+function closeAll(){document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'))}
+function show(id,f){closeAll();$(id).classList.add('on');if(f)f.focus()}
+document.querySelectorAll('.x').forEach(b=>b.onclick=()=>{closeAll();if(run){run=null;hl=null;render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+window.onresize=()=>render();
+
+function openSt(k){
+  sel=k;const s=D.st[k];
+  $('sn').textContent=s.n;$('ss').textContent=lineOf(k).n+' · '+grpOf(lineOf(k));
+  [...$('sg').children].forEach((b,i)=>b.setAttribute('aria-pressed',s.s===i));
+  const n=pass(k);$('rv').hidden=!n;
+  if(n)$('rvt').textContent='Čeká na zopakování '+(n>1?'(už '+n+' dny)':'');
+  $('lk').innerHTML=links(k).map(l=>{const o=l[0]===k?l[1]:l[0];return'<span class="chip">'+esc(D.st[o].n)+'<button data-u="'+o+'" aria-label="Odpojit">×</button></span>'}).join('');
+  $('nt').value=s.note||'';show('p-st');
+}
+ST.forEach((n,i)=>{const b=document.createElement('button');b.textContent=n==='Nové'?'Nové':n;b.onclick=()=>{setS(sel,i);render();openSt(sel)};$('sg').appendChild(b)});
+$('lk').onclick=e=>{const u=e.target.dataset.u;if(u){D.links=D.links.filter(l=>!(l.includes(sel)&&l.includes(u)));save();render();openSt(sel)}};
+$('rok').onclick=()=>{review(sel,true);render();closeAll();say('Zopakováno. Další opakování naplánováno.')};
+$('rno').onclick=()=>{review(sel,false);render();closeAll();say('Nevadí, zítra se na to podíváš znovu.')};
+$('lnk').onclick=()=>{if(D.st[sel].s<1){say('Nejdřív téma začni, pak ho jde spojit.');closeAll();return}linkFrom=sel;closeAll();say('Klepni na téma, se kterým ho chceš spojit.')};
+$('nt').oninput=e=>{D.st[sel].note=e.target.value;save()};
+$('sdel').onclick=()=>{D.lines.forEach(l=>l.s=l.s.filter(k=>k!==sel));D.links=D.links.filter(l=>!l.includes(sel));delete D.st[sel];save();closeAll();render()};
+
+/* jízda vlakem */
+function startRun(){const r=route();if(!r.length)return;run={r,i:0};showRun()}
+function showRun(){
+  if(run.i>=run.r.length){run=null;hl=null;closeAll();say('Jízda dokončena. Síť je zase čistá.');render();return}
+  const k=run.r[run.i];hl=k;
+  $('rs').textContent='Zastávka '+(run.i+1)+' z '+run.r.length+' · '+lineOf(k).n;
+  $('rn').textContent=D.st[k].n;$('rnote').textContent=D.st[k].note||'';
+  show('p-run');
+  if(tab==='Týden'||!pos[k])tab='Vše';
+  render();const p=pos[k];if(p)$('mn').scrollTo({left:Math.max(0,p[0]-140),top:Math.max(0,p[1]-140),behavior:'smooth'});
+}
+$('go').onclick=startRun;
+$('wk').onclick=e=>{if(e.target.id==='go2')return startRun();const b=e.target.closest('[data-k]');if(b)openSt(b.dataset.k)};
+$('yes').onclick=()=>{review(run.r[run.i],true);run.i++;showRun()};
+$('nope').onclick=()=>{review(run.r[run.i],false);run.i++;showRun()};
+$('skip').onclick=()=>{run.i++;showRun()};
+$('bd').onclick=()=>{D.off=(D.off||0)+1;save();say('Uplynul další den.');render()};
+
+/* přidávání */
+function openAdd(l){
+  editLine=l||null;$('an').value=l?l.n:'';$('ax').value='';
+  $('at').textContent=l?'Přidat do: '+l.n:'Přidat témata';$('adel').hidden=!l;
+  show('p-add',l?$('ax'):$('an'));
+}
+$('ba').onclick=()=>openAdd(null);$('be').onclick=()=>openAdd(null);
+$('ago').onclick=()=>{
+  const name=$('an').value.trim(),text=$('ax').value;
+  if(!name&&!/^\s*(#.+|.+:)\s*$/m.test(text)){$('an').focus();return}
+  const g=(tab!=='Vše'&&tab!=='Týden'&&D.lines.find(l=>grpOf(l)===tab)||{}).g||'';
+  add(text,name,g);closeAll();render();
+};
+$('adel').onclick=()=>{
+  const l=editLine;if(!l)return;D.lines=D.lines.filter(x=>x!==l);
+  const used=new Set();D.lines.forEach(x=>x.s.forEach(k=>used.add(k)));
+  for(const k in D.st)if(!used.has(k)){delete D.st[k];D.links=D.links.filter(z=>!z.includes(k))}
+  save();closeAll();render();
+};
+
+/* --- export / import paměti --- */
+$('b-export').onclick = () => {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(D));
+  const dl = document.createElement('a');
+  dl.setAttribute("href", dataStr);
+  dl.setAttribute("download", "linky_uceni_pamet.json");
+  dl.click();
+  say('Paměť byla stažena do počítače.');
+};
+
+$('b-import').onclick = () => $('f-import').click();
+$('f-import').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      D = JSON.parse(event.target.result);
+      save();
+      render();
+      say('Paměť úspěšně načtena!');
+    } catch (err) {
+      say('Chyba: Neplatný soubor paměti.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; 
+};
+
+render();
+</script>
+</body>
+</html>
