@@ -29,8 +29,8 @@ main{flex:1;min-height:0;overflow:hidden; position:relative; background:var(--bg
 main:active{cursor:grabbing;}
 svg{display:block;user-select:none;-webkit-user-select:none; width:100%; height:100%; touch-action:none;}
 .st{cursor:pointer}
-.lbl{font-size:11.5px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--halo);stroke-width:3.5px;pointer-events:none;text-anchor:middle}
-.ln{font-size:14px;font-weight:800;cursor:pointer;paint-order:stroke;stroke:var(--halo);stroke-width:4px}
+.lbl{font-size:10px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--halo);stroke-width:2.5px;pointer-events:none;text-anchor:middle}
+.ln{font-size:12px;font-weight:800;cursor:pointer;paint-order:stroke;stroke:var(--halo);stroke-width:3px}
 .ring{fill:none;stroke-width:3;transform-box:fill-box;transform-origin:center;animation:p 1.1s ease-in-out infinite alternate}
 @keyframes p{from{opacity:.95;transform:scale(1)}to{opacity:.25;transform:scale(1.3)}}
 @media (prefers-reduced-motion:reduce){.ring{animation:none}}
@@ -137,7 +137,7 @@ label{font-size:13px;color:var(--mute);display:block;margin-bottom:2px}
 </div>
 
 <script>
-const NS='http://www.w3.org/2000/svg',DAY=864e5,INT=[1,3,7,14,30,60],R=11;
+const NS='http://www.w3.org/2000/svg',DAY=864e5,INT=[1,3,7,14,30,60],R=9;
 const PAL=['#2f6fd6','#d9342b','#1f9d55','#e08a00','#8b45c9','#0aa2b8','#d6428c','#6b7280','#7a9a01','#b5651d'];
 const ST=['Nové','Učím se','Umím'];
 
@@ -214,7 +214,7 @@ function layout(){
   pos={}; cell={};
   const isCelá = tab === 'Celá síť';
   const visLines = D.lines.filter(l => l.s.length > 0);
-  const cx = 0, cy = 0; // Střed mapy (0,0)
+  const cx = 0, cy = 0; 
 
   const angleStep = (Math.PI * 2) / Math.max(1, visLines.length);
 
@@ -226,9 +226,9 @@ function layout(){
     const visNodes = l.s.filter(k => isCelá || isActive(k));
 
     visNodes.forEach((k, j) => {
-      const wave = (j % 2 === 0 ? 1 : -1) * 0.18; 
+      const wave = (j % 2 === 0 ? 1 : -1) * 0.15; 
       const angle = baseAngle + wave;
-      r += 100; // Konstantní rozestup mezi stanicemi
+      r += 160; 
       
       const x = cx + Math.cos(angle) * r;
       const y = cy + Math.sin(angle) * r;
@@ -237,9 +237,9 @@ function layout(){
     });
 
     if(visNodes.length > 0) {
-      cell[l.id] = [lastPos[0] + Math.cos(baseAngle)*60, lastPos[1] + Math.sin(baseAngle)*60];
+      cell[l.id] = [lastPos[0] + Math.cos(baseAngle)*80, lastPos[1] + Math.sin(baseAngle)*80];
     } else {
-      cell[l.id] = [cx + Math.cos(baseAngle)*60, cy + Math.sin(baseAngle)*60];
+      cell[l.id] = [cx + Math.cos(baseAngle)*80, cy + Math.sin(baseAngle)*80];
     }
   });
   return visLines;
@@ -284,7 +284,6 @@ function render(){
   
   const visLines = layout();
 
-  // Vytvoření viewportu pro pan/zoom
   const vp = el('g', {id:'vp', transform:`translate(${panX},${panY}) scale(${scale})`}, svg);
 
   visLines.forEach(l=>{
@@ -293,18 +292,28 @@ function render(){
     const t=el('text',{x:cell[l.id][0],y:cell[l.id][1],class:'ln',fill:l.c,tabindex:0,role:'button', 'text-anchor':'middle'},vp);
     t.textContent=l.n;t.onclick=()=>openAdd(l);
     
-    const visNodes = l.s.filter(k => pos[k]);
-    for(let i=1;i<visNodes.length;i++) {
-      const a = visNodes[i-1], b = visNodes[i];
-      // Čára je barevná jen tehdy, pokud je cílová stanice aktivní, jinak ztlumená šedá
-      const strokeC = isActive(b) ? l.c : 'var(--line)';
-      el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:strokeC,'stroke-width':5,'stroke-linejoin':'round','stroke-linecap':'round'},vp);
+    // Propojení aktivních uzlů v dané lince
+    const activeNodesInLine = l.s.filter(k => pos[k] && isActive(k));
+    for(let i=1;i<activeNodesInLine.length;i++) {
+        const a = activeNodesInLine[i-1], b = activeNodesInLine[i];
+        el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:l.c,'stroke-width':4,'stroke-linejoin':'round','stroke-linecap':'round'},vp);
+    }
+
+    // Pokud jsme v zobrazení celé sítě, vykreslíme i tlumené čáry pro neaktivní uzly
+    if(tab === 'Celá síť') {
+        const visNodes = l.s.filter(k => pos[k]);
+        for(let i=1;i<visNodes.length;i++) {
+            const a = visNodes[i-1], b = visNodes[i];
+            if (!isActive(a) || !isActive(b)) {
+                 el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:'var(--line)','stroke-width':4,'stroke-linejoin':'round','stroke-linecap':'round'},vp);
+            }
+        }
     }
   });
 
   D.links.forEach(([a,b])=>{if(!pos[a]||!pos[b])return;
     const x=grpOf(lineOf(a))!==grpOf(lineOf(b));
-    el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:x?'var(--ink)':lineOf(a).c,'stroke-width':8,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':x?'14 8':'none'},vp);
+    el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:x?'var(--ink)':lineOf(a).c,'stroke-width':6,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':x?'10 6':'none'},vp);
   });
 
   for(const k in pos){
@@ -313,15 +322,15 @@ function render(){
     const g=el('g',{class:'st',tabindex:0,role:'button','aria-label':s.n,transform:`translate(${pos[k]})`},vp);
     
     const n=pass(k);
-    if(n)el('circle',{class:'ring',r:R+7,stroke:'var(--red)'},g);
-    if(hl===k)el('circle',{class:'ring',r:R+10,stroke:'#2f7de1'},g);
-    if(s.s===0&&D.picks.includes(k))el('circle',{r:R+6,fill:'none',stroke:strokeC,'stroke-width':2,'stroke-dasharray':'2 4'},g); 
+    if(n)el('circle',{class:'ring',r:R+5,stroke:'var(--red)'},g);
+    if(hl===k)el('circle',{class:'ring',r:R+8,stroke:'#2f7de1'},g);
+    if(s.s===0&&D.picks.includes(k))el('circle',{r:R+4,fill:'none',stroke:strokeC,'stroke-width':2,'stroke-dasharray':'2 4'},g); 
     
-    el('circle',{r:R,stroke:strokeC,'stroke-width':4,fill:s.s===2?'var(--ink)':s.s===1?strokeC:'var(--panel)','stroke-dasharray':s.s===0?'4 3':'none'},g);
-    for(let i=0;i<n;i++)el('circle',{r:3.5,cx:(i-(n-1)/2)*9,cy:-R-14,fill:'var(--red)'},g); 
+    el('circle',{r:R,stroke:strokeC,'stroke-width':3,fill:s.s===2?'var(--ink)':s.s===1?strokeC:'var(--panel)','stroke-dasharray':s.s===0?'3 2':'none'},g);
+    for(let i=0;i<n;i++)el('circle',{r:2.5,cx:(i-(n-1)/2)*7,cy:-R-10,fill:'var(--red)'},g); 
     
     wrap(s.n).forEach((tx,j)=>{
-      const textNode = el('text',{class:'lbl',y:R+18+j*12},g);
+      const textNode = el('text',{class:'lbl',y:R+14+j*10},g);
       textNode.textContent=tx;
       if(!active) { textNode.style.fill = 'var(--mute)'; textNode.style.stroke = 'var(--bg)'; }
     });
@@ -354,7 +363,7 @@ const hit=(p,r)=>Object.keys(pos).filter(k=>Math.hypot(pos[k][0]-p[0],pos[k][1]-
 svg.onpointerdown=e=>{
   if(tab==='List úkolů') return;
   const p=pt(e);
-  const k=hit(p, 24 / scale);
+  const k=hit(p, 20 / scale);
   if (k) {
     drag={k,p,moved:false};
   } else {
@@ -374,25 +383,24 @@ svg.onpointermove=e=>{
   if(!drag)return;const p=pt(e);
   if(Math.hypot(p[0]-drag.p[0],p[1]-drag.p[1])>8 / scale)drag.moved=true;
   if(drag.moved&&drag.k){
-    let t=$('tmp');if(!t)t=el('path',{id:'tmp',fill:'none','stroke-width':8,'stroke-linecap':'round',opacity:.55,'pointer-events':'none'},$('vp'));
+    let t=$('tmp');if(!t)t=el('path',{id:'tmp',fill:'none','stroke-width':6,'stroke-linecap':'round',opacity:.55,'pointer-events':'none'},$('vp'));
     t.setAttribute('stroke',lineOf(drag.k).c);t.setAttribute('d',seg(pos[drag.k],p));
   }
 };
 svg.onpointerup=e=>{
   if(isPanning) { isPanning = false; return; }
   if(!drag)return;const d=drag;drag=null;const t=$('tmp');if(t)t.remove();const p=pt(e);
-  if(!d.moved){if(d.k)tapSt(d.k);else{const l=D.lines.find(l=>cell[l.id]&&Math.hypot(p[0]-cell[l.id][0], p[1]-cell[l.id][1])<40 / scale);if(l)openAdd(l)}return}
-  if(d.k){const k=hit(p,28 / scale);if(k&&k!==d.k)connect(d.k,k)}
+  if(!d.moved){if(d.k)tapSt(d.k);else{const l=D.lines.find(l=>cell[l.id]&&Math.hypot(p[0]-cell[l.id][0], p[1]-cell[l.id][1])<30 / scale);if(l)openAdd(l)}return}
+  if(d.k){const k=hit(p,24 / scale);if(k&&k!==d.k)connect(d.k,k)}
 };
 
-// Zoom kolečkem myši
 svg.onwheel = e => {
   e.preventDefault();
   const xs = (e.clientX - panX) / scale;
   const ys = (e.clientY - panY) / scale;
-  const delta = e.deltaY > 0 ? 0.9 : 1.1; // 0.9 oddálení, 1.1 přiblížení
+  const delta = e.deltaY > 0 ? 0.9 : 1.1; 
   scale *= delta;
-  scale = Math.max(0.1, Math.min(scale, 5)); // Omezení zoomu
+  scale = Math.max(0.1, Math.min(scale, 5)); 
   panX = e.clientX - xs * scale;
   panY = e.clientY - ys * scale;
   const vp = $('vp');
