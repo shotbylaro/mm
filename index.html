@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font-family:'Overpass',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
-header{display:flex;align-items:center;gap:10px;padding:12px 16px 4px;flex-wrap:wrap}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px 4px;flex-wrap:wrap;z-index:10}
 h1{font-size:18px;font-weight:800;margin:0;margin-right:auto}
 #cnt{font-size:13px;color:var(--mute)}
 button,select,input,textarea{font:inherit;color:inherit}
@@ -19,28 +19,29 @@ button{cursor:pointer}
 .add{border:0;background:var(--ink);color:var(--bg);border-radius:20px;padding:7px 16px;font-weight:600;font-size:14px}
 .sm{border:2px solid var(--line);background:transparent;border-radius:20px;padding:4px 11px;font-size:13px;font-weight:600}
 :focus-visible{outline:3px solid #2f7de1;outline-offset:2px}
-#tabs{display:flex;gap:6px;padding:6px 16px;overflow-x:auto}
+#tabs{display:flex;gap:6px;padding:6px 16px;overflow-x:auto;z-index:10}
 .tab{border:2px solid var(--line);background:transparent;border-radius:18px;padding:5px 12px;font-weight:600;font-size:14px;white-space:nowrap}
 .tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .bd{background:var(--red);color:#fff;border-radius:9px;font-size:11px;padding:1px 6px;margin-left:6px}
-#ban{display:none;margin:2px 16px 4px;padding:8px 12px;border-radius:10px;background:var(--panel);border:2px solid var(--red);align-items:center;gap:10px;justify-content:space-between;font-size:14px}
-#tip{padding:0 16px 6px;font-size:13px;color:var(--mute);min-height:20px}
-main{flex:1;min-height:0;overflow:auto; display:flex; align-items:center; justify-content:center;}
-svg{display:block;user-select:none;-webkit-user-select:none; width:100%; height:100%; max-height:100%;}
+#ban{display:none;margin:2px 16px 4px;padding:8px 12px;border-radius:10px;background:var(--panel);border:2px solid var(--red);align-items:center;gap:10px;justify-content:space-between;font-size:14px;z-index:10}
+#tip{padding:0 16px 6px;font-size:13px;color:var(--mute);min-height:20px;z-index:10}
+main{flex:1;min-height:0;overflow:hidden; position:relative; background:var(--bg); cursor:grab;}
+main:active{cursor:grabbing;}
+svg{display:block;user-select:none;-webkit-user-select:none; width:100%; height:100%; touch-action:none;}
 .st{cursor:pointer}
 .lbl{font-size:11.5px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--halo);stroke-width:3.5px;pointer-events:none;text-anchor:middle}
 .ln{font-size:14px;font-weight:800;cursor:pointer;paint-order:stroke;stroke:var(--halo);stroke-width:4px}
 .ring{fill:none;stroke-width:3;transform-box:fill-box;transform-origin:center;animation:p 1.1s ease-in-out infinite alternate}
 @keyframes p{from{opacity:.95;transform:scale(1)}to{opacity:.25;transform:scale(1.3)}}
 @media (prefers-reduced-motion:reduce){.ring{animation:none}}
-#wk{display:none;padding:8px 16px 90px; max-width:560px; margin: 0 auto; height:100%; overflow:auto;}
+#wk{display:none;padding:8px 16px 90px; max-width:560px; margin: 0 auto; height:100%; overflow:auto; position:relative; z-index:15; cursor:auto;}
 #wk h3{font-size:15px;margin:16px 0 8px}
 .it{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 10px 8px 24px;margin-bottom:6px;font-weight:600;position:relative}
 .it i{position:absolute;left:9px;top:14px;width:8px;height:8px;border-radius:50%}
 .it small{color:var(--mute);font-weight:400}
 #empty{display:none;max-width:380px;margin:12vh auto 0;padding:0 20px;text-align:center;color:var(--mute);line-height:1.5}
 #empty b{color:var(--ink);font-size:20px;display:block;margin-bottom:6px}
-.pn{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(400px,calc(100% - 24px));background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:14px;display:none;box-shadow:0 6px 24px rgba(0,0,0,.14);max-height:82vh;overflow:auto}
+.pn{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(400px,calc(100% - 24px));background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:14px;display:none;box-shadow:0 6px 24px rgba(0,0,0,.14);max-height:82vh;overflow:auto;z-index:20}
 .pn.on{display:block}
 .pn h2{margin:0 0 4px;font-size:18px}
 .sub{font-size:13px;color:var(--mute);margin-bottom:10px}
@@ -61,7 +62,6 @@ label{font-size:13px;color:var(--mute);display:block;margin-bottom:2px}
 </head>
 <body>
 
-<!-- PŘIHLAŠOVACÍ OBRAZOVKA -->
 <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
   <h2 style="margin-bottom:12px;">Přístup chráněn</h2>
   <input type="password" id="pass-input" placeholder="Zadej heslo" style="width:200px; text-align:center; padding:8px; border:2px solid var(--line); border-radius:8px; background:var(--panel); margin-bottom:12px;">
@@ -91,7 +91,6 @@ label{font-size:13px;color:var(--mute);display:block;margin-bottom:2px}
     if (e.key === 'Enter') passBtn.click();
   });
 </script>
-<!-- KONEC PŘIHLAŠOVACÍ OBRAZOVKY -->
 
 <header>
   <h1>Linky učení</h1>
@@ -141,7 +140,6 @@ label{font-size:13px;color:var(--mute);display:block;margin-bottom:2px}
 const NS='http://www.w3.org/2000/svg',DAY=864e5,INT=[1,3,7,14,30,60],R=11;
 const PAL=['#2f6fd6','#d9342b','#1f9d55','#e08a00','#8b45c9','#0aa2b8','#d6428c','#6b7280','#7a9a01','#b5651d'];
 const ST=['Nové','Učím se','Umím'];
-const SEED=``; 
 
 const $=i=>document.getElementById(i);
 const el=(n,a,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
@@ -150,13 +148,16 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 let D=null;try{D=JSON.parse(localStorage.getItem('metro5')||'null')}catch(e){}
 const save=()=>{try{localStorage.setItem('metro5',JSON.stringify(D))}catch(e){}};
 const now=()=>Date.now()+((D&&D.off)||0)*DAY;
+
 let tab='',sel=null,pos={},cell={},drag=null,linkFrom=null,run=null,hl=null,editLine=null;
+let panX=null, panY=null, scale=1, isPanning=false, startPan={x:0,y:0};
+
 const grpOf=l=>(l.g||'Ostatní').split(':')[0];
 const groups=()=>[...new Set(D.lines.map(grpOf))];
 const lineOf=k=>D.lines.find(l=>l.s.includes(k));
 const links=k=>D.links.filter(l=>l.includes(k));
 const say=t=>$('tip').textContent=t;
-const HINT='Mini Metro styl: Linky startují uprostřed. Spoj témata tažením čáry.';
+const HINT='Mini Metro styl: Pohybuj se tažením, přibližuj kolečkem. Spoj témata tažením čáry.';
 
 function add(text,defName,g0){
   let cur=defName.trim(),grp=g0||'';
@@ -175,12 +176,14 @@ function add(text,defName,g0){
   });
   save();
 }
-if(!D){D={lines:[],st:{},links:[]};if(SEED)add(SEED,'')}
+if(!D){D={lines:[],st:{},links:[]};}
 if(!D.links)D.links=[];
 
 /* --- učení a opakování --- */
 const pass=k=>{const s=D.st[k];return s.s===2&&s.due<=now()?Math.min(6,1+Math.floor((now()-s.due)/DAY)):0};
 const dueList=()=>Object.keys(D.st).filter(k=>pass(k)>0);
+const isActive = k => D.st[k].s > 0 || D.picks.includes(k);
+
 function setS(k,i){const s=D.st[k];s.s=i;s.t=now();if(i===2){if(!s.due){s.lv=0;s.due=now()+DAY}}else{delete s.due;delete s.lv}save()}
 function review(k,ok){const s=D.st[k];s.lv=ok?Math.min((s.lv||0)+1,5):0;
   s.due=now()+Math.max(.5,INT[s.lv]/(1+.25*Math.min(4,links(k).length)))*DAY;save()}
@@ -209,12 +212,9 @@ function wrap(n){
 }
 function layout(){
   pos={}; cell={};
-  // Změněná logika: tab 'Aktuální mapa' ukáže jen to podstatné (Fog of war)
   const isCelá = tab === 'Celá síť';
   const visLines = D.lines.filter(l => l.s.length > 0);
-  
-  let minX=0, minY=0, maxX=800, maxY=600;
-  const cx=400, cy=300; // Centrální bod mapy
+  const cx = 0, cy = 0; // Střed mapy (0,0)
 
   const angleStep = (Math.PI * 2) / Math.max(1, visLines.length);
 
@@ -223,47 +223,37 @@ function layout(){
     let r = 0;
     let lastPos = [cx, cy];
     
-    // Uzel je vidět, pokud je to celá síť, NEBO už se ho učím, NEBO je to novinka na tento týden
-    const visNodes = l.s.filter(k => isCelá || D.st[k].s > 0 || D.picks.includes(k));
+    const visNodes = l.s.filter(k => isCelá || isActive(k));
 
     visNodes.forEach((k, j) => {
-      // Hravý zlom linky - dělá to víc "metro" feel
-      const wave = (j % 2 === 0 ? 1 : -1) * 0.25; 
-      const angle = baseAngle + (j * 0.15 * wave);
-      
-      r += 80 + (Math.random() * 30); // Prodlužujeme radius
+      const wave = (j % 2 === 0 ? 1 : -1) * 0.18; 
+      const angle = baseAngle + wave;
+      r += 100; // Konstantní rozestup mezi stanicemi
       
       const x = cx + Math.cos(angle) * r;
       const y = cy + Math.sin(angle) * r;
       pos[k] = [x, y];
       lastPos = [x, y];
-
-      minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-      minY = Math.min(minY, y); maxY = Math.max(maxY, y);
     });
 
     if(visNodes.length > 0) {
-      cell[l.id] = [lastPos[0] + Math.cos(baseAngle)*50, lastPos[1] + Math.sin(baseAngle)*50];
+      cell[l.id] = [lastPos[0] + Math.cos(baseAngle)*60, lastPos[1] + Math.sin(baseAngle)*60];
     } else {
-      cell[l.id] = [cx + Math.cos(baseAngle)*50, cy + Math.sin(baseAngle)*50]; // Pokud nemá viditelné uzly
+      cell[l.id] = [cx + Math.cos(baseAngle)*60, cy + Math.sin(baseAngle)*60];
     }
   });
-
-  // Dynamický ViewBox s paddingem pro automatické oddalování
-  const pad = 120;
-  const W = maxX - minX + pad * 2;
-  const H = maxY - minY + pad * 2;
-  const vBox = `${minX - pad} ${minY - pad} ${W} ${H}`;
-  
-  return [W, H, visLines, vBox];
+  return visLines;
 }
 function seg(a,b){
   const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.abs(dy);
   if(!dy||Math.abs(dx)<d)return`M${a} L${b}`;
   const s=Math.sign(dx);return`M${a} L${b[0]-s*d},${a[1]} L${b}`;
 }
+
 function render(){
   tickWeek();
+  if(panX === null) { panX = window.innerWidth / 2; panY = window.innerHeight / 2; }
+  
   const tabs=['Aktuální mapa', 'Celá síť', 'List úkolů'];
   if(!tab||!tabs.includes(tab))tab='Aktuální mapa';
   const due=dueList(),dg={};due.forEach(k=>{const g=grpOf(lineOf(k));dg[g]=(dg[g]||0)+1});
@@ -292,76 +282,125 @@ function render(){
   if(tab==='List úkolů'){svg.style.display='none';$('wk').style.display=has?'block':'none';if(has)$('wk').innerHTML=wkHtml();return}
   $('wk').style.display='none';svg.style.display='block';svg.innerHTML='';
   
-  const [W,H,visLines,vBox]=layout();
-  svg.setAttribute('viewBox', vBox); // Toto dělá auto-zoom
+  const visLines = layout();
 
-  // Vykreslení čar linek (spojí jen viditelné body)
+  // Vytvoření viewportu pro pan/zoom
+  const vp = el('g', {id:'vp', transform:`translate(${panX},${panY}) scale(${scale})`}, svg);
+
   visLines.forEach(l=>{
-    const t=el('text',{x:cell[l.id][0],y:cell[l.id][1],class:'ln',fill:l.c,tabindex:0,role:'button', 'text-anchor':'middle'},svg);
+    const hasVisible = l.s.some(k => pos[k]);
+    if (!hasVisible) return;
+    const t=el('text',{x:cell[l.id][0],y:cell[l.id][1],class:'ln',fill:l.c,tabindex:0,role:'button', 'text-anchor':'middle'},vp);
     t.textContent=l.n;t.onclick=()=>openAdd(l);
+    
     const visNodes = l.s.filter(k => pos[k]);
     for(let i=1;i<visNodes.length;i++) {
-      el('path',{d:seg(pos[visNodes[i-1]],pos[visNodes[i]]),fill:'none',stroke:l.c,'stroke-width':4,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+      const a = visNodes[i-1], b = visNodes[i];
+      // Čára je barevná jen tehdy, pokud je cílová stanice aktivní, jinak ztlumená šedá
+      const strokeC = isActive(b) ? l.c : 'var(--line)';
+      el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:strokeC,'stroke-width':5,'stroke-linejoin':'round','stroke-linecap':'round'},vp);
     }
   });
 
-  // Vykreslení uživatelských propojení (přestupů)
   D.links.forEach(([a,b])=>{if(!pos[a]||!pos[b])return;
     const x=grpOf(lineOf(a))!==grpOf(lineOf(b));
-    el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:x?'var(--ink)':lineOf(a).c,'stroke-width':8,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':x?'14 8':'none'},svg);
+    el('path',{d:seg(pos[a],pos[b]),fill:'none',stroke:x?'var(--ink)':lineOf(a).c,'stroke-width':8,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':x?'14 8':'none'},vp);
   });
 
-  // Vykreslení samotných stanic
   for(const k in pos){
-    const s=D.st[k],c=lineOf(k).c,n=pass(k);
-    const g=el('g',{class:'st',tabindex:0,role:'button','aria-label':s.n,transform:`translate(${pos[k]})`},svg);
+    const s=D.st[k], active = isActive(k);
+    const strokeC = active ? lineOf(k).c : 'var(--mute)';
+    const g=el('g',{class:'st',tabindex:0,role:'button','aria-label':s.n,transform:`translate(${pos[k]})`},vp);
     
+    const n=pass(k);
     if(n)el('circle',{class:'ring',r:R+7,stroke:'var(--red)'},g);
     if(hl===k)el('circle',{class:'ring',r:R+10,stroke:'#2f7de1'},g);
-    if(s.s===0&&D.picks.includes(k))el('circle',{r:R+6,fill:'none',stroke:'var(--ink)','stroke-width':2,'stroke-dasharray':'2 4'},g); // Novinka na týden
+    if(s.s===0&&D.picks.includes(k))el('circle',{r:R+6,fill:'none',stroke:strokeC,'stroke-width':2,'stroke-dasharray':'2 4'},g); 
     
-    el('circle',{r:R,stroke:c,'stroke-width':4,fill:s.s===2?'var(--ink)':s.s===1?c:'var(--panel)','stroke-dasharray':s.s===0?'4 3':'none'},g);
-    for(let i=0;i<n;i++)el('circle',{r:3.5,cx:(i-(n-1)/2)*9,cy:-R-14,fill:'var(--red)'},g); // Notifikační tečky
+    el('circle',{r:R,stroke:strokeC,'stroke-width':4,fill:s.s===2?'var(--ink)':s.s===1?strokeC:'var(--panel)','stroke-dasharray':s.s===0?'4 3':'none'},g);
+    for(let i=0;i<n;i++)el('circle',{r:3.5,cx:(i-(n-1)/2)*9,cy:-R-14,fill:'var(--red)'},g); 
     
-    wrap(s.n).forEach((tx,j)=>{el('text',{class:'lbl',y:R+18+j*12},g).textContent=tx});
+    wrap(s.n).forEach((tx,j)=>{
+      const textNode = el('text',{class:'lbl',y:R+18+j*12},g);
+      textNode.textContent=tx;
+      if(!active) { textNode.style.fill = 'var(--mute)'; textNode.style.stroke = 'var(--bg)'; }
+    });
     g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tapSt(k)}};
   }
 }
+
 function wkHtml(){
   const H=k=>`<button class="it" data-k="${k}"><i style="background:${lineOf(k).c}"></i>${esc(D.st[k].n)}<small>${ST[D.st[k].s]}</small></button>`;
   const due=dueList();
-  const nx=groups().flatMap(g=>nextFor(g,2,D.picks));
-  return '<h3>Tento týden na obzoru</h3>'+(D.picks.length?D.picks.map(H).join(''):'<div class="sub">Vše načato. Mapa roste!</div>')
+  
+  const picks1 = D.picks || [];
+  const picks2 = groups().flatMap(g=>nextFor(g, 2, picks1));
+  const picks3 = groups().flatMap(g=>nextFor(g, 2, [...picks1, ...picks2]));
+  
+  return '<h3>Tento týden na obzoru</h3>'+(picks1.length?picks1.map(H).join(''):'<div class="sub">Vše načato. Mapa roste!</div>')
    +'<h3>K procvičení (Přetížené stanice)</h3>'+(due.length?due.map(H).join('')+'<button class="go" id="go2" style="margin-top:6px">Jet vlakem</button>':'<div class="sub">Všechno umíš.</div>')
-   +'<h3>Zásoba na příští dny</h3>'+(nx.length?nx.map(H).join(''):'<div class="sub">Nic dalšího nečeká.</div>');
+   +'<h3>Příští týden</h3>'+(picks2.length?picks2.map(H).join(''):'<div class="sub">Zatím prázdno.</div>')
+   +'<h3>Za 14 dní</h3>'+(picks3.length?picks3.map(H).join(''):'<div class="sub">Zatím prázdno.</div>');
 }
 
-/* --- interakce --- */
+/* --- interakce & Pan/Zoom --- */
 const svg=$('map');
 const pt=e=>{
   const r=svg.getBoundingClientRect();
-  const viewbox = svg.getAttribute('viewBox').split(' ').map(Number);
-  const scaleX = viewbox[2] / r.width;
-  const scaleY = viewbox[3] / r.height;
-  return [(e.clientX - r.left) * scaleX + viewbox[0], (e.clientY - r.top) * scaleY + viewbox[1]];
+  return [(e.clientX - r.left - panX) / scale, (e.clientY - r.top - panY) / scale];
 };
 const hit=(p,r)=>Object.keys(pos).filter(k=>Math.hypot(pos[k][0]-p[0],pos[k][1]-p[1])<r).sort((a,b)=>Math.hypot(pos[a][0]-p[0],pos[a][1]-p[1])-Math.hypot(pos[b][0]-p[0],pos[b][1]-p[1]))[0];
-svg.onpointerdown=e=>{drag={k:hit(pt(e),24),p:pt(e),moved:false};try{svg.setPointerCapture(e.pointerId)}catch(x){}};
+
+svg.onpointerdown=e=>{
+  if(tab==='List úkolů') return;
+  const p=pt(e);
+  const k=hit(p, 24 / scale);
+  if (k) {
+    drag={k,p,moved:false};
+  } else {
+    isPanning = true;
+    startPan = {x: e.clientX - panX, y: e.clientY - panY};
+  }
+  try{svg.setPointerCapture(e.pointerId)}catch(x){}
+};
 svg.onpointermove=e=>{
+  if(isPanning) {
+    panX = e.clientX - startPan.x;
+    panY = e.clientY - startPan.y;
+    const vp = $('vp');
+    if(vp) vp.setAttribute('transform', `translate(${panX},${panY}) scale(${scale})`);
+    return;
+  }
   if(!drag)return;const p=pt(e);
-  if(Math.hypot(p[0]-drag.p[0],p[1]-drag.p[1])>8)drag.moved=true;
+  if(Math.hypot(p[0]-drag.p[0],p[1]-drag.p[1])>8 / scale)drag.moved=true;
   if(drag.moved&&drag.k){
-    let t=$('tmp');if(!t)t=el('path',{id:'tmp',fill:'none','stroke-width':8,'stroke-linecap':'round',opacity:.55,'pointer-events':'none'},svg);
+    let t=$('tmp');if(!t)t=el('path',{id:'tmp',fill:'none','stroke-width':8,'stroke-linecap':'round',opacity:.55,'pointer-events':'none'},$('vp'));
     t.setAttribute('stroke',lineOf(drag.k).c);t.setAttribute('d',seg(pos[drag.k],p));
   }
 };
 svg.onpointerup=e=>{
+  if(isPanning) { isPanning = false; return; }
   if(!drag)return;const d=drag;drag=null;const t=$('tmp');if(t)t.remove();const p=pt(e);
-  if(!d.moved){if(d.k)tapSt(d.k);else{const l=D.lines.find(l=>cell[l.id]&&Math.hypot(p[0]-cell[l.id][0], p[1]-cell[l.id][1])<40);if(l)openAdd(l)}return}
-  if(d.k){const k=hit(p,28);if(k&&k!==d.k)connect(d.k,k)}
+  if(!d.moved){if(d.k)tapSt(d.k);else{const l=D.lines.find(l=>cell[l.id]&&Math.hypot(p[0]-cell[l.id][0], p[1]-cell[l.id][1])<40 / scale);if(l)openAdd(l)}return}
+  if(d.k){const k=hit(p,28 / scale);if(k&&k!==d.k)connect(d.k,k)}
 };
+
+// Zoom kolečkem myši
+svg.onwheel = e => {
+  e.preventDefault();
+  const xs = (e.clientX - panX) / scale;
+  const ys = (e.clientY - panY) / scale;
+  const delta = e.deltaY > 0 ? 0.9 : 1.1; // 0.9 oddálení, 1.1 přiblížení
+  scale *= delta;
+  scale = Math.max(0.1, Math.min(scale, 5)); // Omezení zoomu
+  panX = e.clientX - xs * scale;
+  panY = e.clientY - ys * scale;
+  const vp = $('vp');
+  if(vp) vp.setAttribute('transform', `translate(${panX},${panY}) scale(${scale})`);
+};
+
 function connect(a,b){
-  if(D.st[a].s<1||D.st[b].s<1){say('Spojit jdou jen témata, která už se učíš nebo umíš.');return}
+  if(D.st[a].s<1||D.st[b].s<1){say('Spojit jdou jen aktivní témata (Učím se / Umím).');return}
   if(D.links.some(l=>l.includes(a)&&l.includes(b))){say('Tato linka už je spojená.');return}
   D.links.push([a,b]);save();say('Vytvořen přestup: '+D.st[a].n+' ↔ '+D.st[b].n);render();
 }
@@ -373,7 +412,9 @@ function closeAll(){document.querySelectorAll('.pn').forEach(p=>p.classList.remo
 function show(id,f){closeAll();$(id).classList.add('on');if(f)f.focus()}
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>{closeAll();if(run){run=null;hl=null;render()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
-window.onresize=()=>render();
+window.onresize=()=>{
+  panX = window.innerWidth/2; panY = window.innerHeight/2; render();
+};
 
 function openSt(k){
   sel=k;const s=D.st[k];
